@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import * as TWEEN from '@tweenjs/tween.js';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 
@@ -117,24 +116,40 @@ function buildGrid() {
   });
 }
 
+// Own tiny animation loop (no tween library): exponential in/out easing
+let anims = [];
+const ease = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2);
+
 function transform(list, duration) {
-  TWEEN.removeAll();
-  objects.forEach((obj, i) => {
+  const now = performance.now();
+  anims = objects.map((obj, i) => {
     const t = list[i];
-    new TWEEN.Tween(obj.position)
-      .to({ x: t.position.x, y: t.position.y, z: t.position.z }, Math.random() * duration + duration)
-      .easing(TWEEN.Easing.Exponential.InOut).start();
-    new TWEEN.Tween(obj.rotation)
-      .to({ x: t.rotation.x, y: t.rotation.y, z: t.rotation.z }, Math.random() * duration + duration)
-      .easing(TWEEN.Easing.Exponential.InOut).start();
+    return {
+      obj,
+      fp: obj.position.clone(),
+      tp: t.position.clone(),
+      fr: new THREE.Vector3(obj.rotation.x, obj.rotation.y, obj.rotation.z),
+      tr: new THREE.Vector3(t.rotation.x, t.rotation.y, t.rotation.z),
+      start: now,
+      dur: Math.random() * duration + duration,
+    };
   });
-  new TWEEN.Tween({}).to({}, duration * 2).onUpdate(render).start();
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  TWEEN.update();
+  const now = performance.now();
+  for (const a of anims) {
+    const k = ease((now - a.start) / a.dur);
+    a.obj.position.lerpVectors(a.fp, a.tp, k);
+    a.obj.rotation.set(
+      a.fr.x + (a.tr.x - a.fr.x) * k,
+      a.fr.y + (a.tr.y - a.fr.y) * k,
+      a.fr.z + (a.tr.z - a.fr.z) * k
+    );
+  }
   controls.update();
+  render();
 }
 
 function render() {
