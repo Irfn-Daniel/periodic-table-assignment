@@ -1,0 +1,24 @@
+html, body { margin: 0; height: 100%; overflow: hidden; background: #000; font-family: Helvetica, Arial, sans-serif; color: #fff; }
+#container { position: absolute; inset: 0; }
+
+.element {
+  width: 120px; height: 160px; box-sizing: border-box; padding: 8px;
+  border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 18%, #000);
+  box-shadow: 0 0 12px var(--c); text-align: center; cursor: default;
+  display: flex; flex-direction: column; align-items: center;
+}
+.element:hover { box-shadow: 0 0 24px var(--c); }
+.element .top { width: 100%; display: flex; justify-content: space-between; font-size: 12px; }
+.element img { width: 90px; height: 90px; object-fit: cover; margin: 6px 0; background: #222; }
+.element .name { font-size: 12px; font-weight: bold; line-height: 1.1; }
+.element .interest { font-size: 11px; opacity: .8; margin-top: 2px; }
+
+#menu { position: absolute; bottom: 20px; width: 100%; text-align: center; display: flex; justify-content: center; align-items: center; gap: 6px; }
+#menu button, #logout button {
+  color: rgba(127,255,255,.75); background: transparent; border: 1px solid rgba(127,255,255,.75);
+  padding: 6px 12px; cursor: pointer; font-size: 12px;
+}
+#menu button:hover, #logout button:hover { background: rgba(0,255,255,.3); color: #fff; }
+#logout { position: absolute; top: 16px; right: 16px; margin: 0; }
+#legend { display: flex; gap: 12px; margin-left: 24px; font-size: 12px; }
+#legend i { display: inline-block; width: 10px; height: 10px; margin-right: 4px; }
